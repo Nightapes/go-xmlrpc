@@ -115,7 +115,6 @@ func (c *Codec) ReadResponseHeader(resp *rpc.Response) error {
 
 	r := call.httpResponse
 	defer r.Body.Close()
-	log.Printf("Response: %s", r.Body)
 
 	if r.StatusCode < 200 || r.StatusCode >= 300 {
 		resp.Error = fmt.Sprintf("bad response code: %d", r.StatusCode)
@@ -123,6 +122,7 @@ func (c *Codec) ReadResponseHeader(resp *rpc.Response) error {
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
+	log.Printf("Response: %s", string(body))
 	if err != nil {
 		resp.Error = err.Error()
 		return nil
