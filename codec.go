@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/rpc"
 	"net/url"
@@ -67,6 +68,7 @@ func (c *Codec) WriteRequest(req *rpc.Request, args interface{}) error {
 		return err
 	}
 
+	log.Printf("Body: %s", bodyBuffer.String())
 	httpRequest, err := http.NewRequest("POST", c.endpoint.String(), bodyBuffer)
 	if err != nil {
 		return err
@@ -75,6 +77,7 @@ func (c *Codec) WriteRequest(req *rpc.Request, args interface{}) error {
 	for key, value := range c.customHeaders {
 		httpRequest.Header.Set(key, value)
 	}
+
 
 	httpRequest.Header.Set("Content-Type", "text/xml")
 	httpRequest.Header.Set("Content-Length", fmt.Sprintf("%d", bodyBuffer.Len()))
@@ -111,8 +114,8 @@ func (c *Codec) ReadResponseHeader(resp *rpc.Response) error {
 	resp.ServiceMethod = call.ServiceMethod
 
 	r := call.httpResponse
-
 	defer r.Body.Close()
+	log.Printf("Response: %s", r.Body)
 
 	if r.StatusCode < 200 || r.StatusCode >= 300 {
 		resp.Error = fmt.Sprintf("bad response code: %d", r.StatusCode)
